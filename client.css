@@ -1,0 +1,27 @@
+.inputs {
+  margin-left: 40px;
+}
+
+.containers {
+  background: bisque;
+  padding: 53px;
+  border-radius: 26px;
+}
+
+.hidden {
+  display: none;
+}
+
+.logoutButton {
+  margin-top: 24px;
+}
+/* .unssuccesfulLogin {
+  width: 118px;
+  background: aquamarine;
+  margin-left: 131px;
+} */
+
+.resultLine {
+  background: aquamarine;
+  margin-bottom: 4px;
+}

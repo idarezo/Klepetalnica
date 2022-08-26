@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="client.css" />
+    <script src="client.js"></script>
+  </head>
+
+  <body>
+    <div id="loginFormContainer" class="containers hidden">
+      <label for="Fname"> First name:</label>
+      <input class="inputs" type="text" id="Fname" />
+      <br /><br />
+
+      <label for="Lname">Last name:</label>
+      <input class="inputs" type="text" id="Lname" />
+
+      <div id="lackOfInformation"></div>
+
+      <br /><br />
+
+      <button type="submit" id="loginButton">Sign up</button>
+    </div>
+
+    <div id="welcomePageContainer" class="hidden containers">
+      <div id="resultPragraph"></div>
+      <button type="submit" id="logoutButton">sign out</button>
+    </div>
+
+    <div id="loadingPageContainer" class="containers">Please wait...</div>
+  </body>
+</html>
