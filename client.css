@@ -25,3 +25,47 @@
   background: aquamarine;
   margin-bottom: 4px;
 }
+
+.chatContainer {
+  background: cornsilk;
+  height: 100%;
+  margin-top: 11px;
+  border-radius: 17px;
+  border: solid;
+  border-color: bisque;
+  padding: 10px;
+}
+
+#message {
+  border: inset;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  width: fit-content;
+}
+
+.messagesContainer {
+  border: solid;
+  border-color: bisque;
+  margin-top: 8px;
+  border-bottom-left-radius: 1px;
+  border-radius: 16px;
+  background-color: #efd6b6;
+  padding: 10px;
+}
+
+.groupMessages {
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  border-radius: 13px;
+  width: fit-content;
+  border: solid;
+  border-color: beige;
+}
+
+#lackOfInformation {
+  width: fit-content;
+  border-radius: 8px;
+  margin-top: 13px;
+  padding: 3px;
+}

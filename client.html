@@ -23,9 +23,28 @@
 
     <div id="welcomePageContainer" class="hidden containers">
       <div id="resultPragraph"></div>
-      <button type="submit" id="logoutButton">sign out</button>
+      <button type="submit" id="logoutButton" style="margin-top: 10px">
+        sign out
+      </button>
     </div>
 
     <div id="loadingPageContainer" class="containers">Please wait...</div>
+
+    <div id="chatContainer" class="chatContainer hidden">
+      <b style="text-decoration: underline">COMPOSE YOUR MESSAGE:</b>
+      <br /><br />
+      <textarea id="message"></textarea>
+
+      <button
+        type="submit"
+        id="sendMessageButton"
+        style="margin-left: 18px; margin-bottom: 10px"
+      >
+        send message
+      </button>
+    </div>
+    <div id="messagesContainer" class="messagesContainer hidden">
+      <b style="text-decoration: underline">MESSAGES:</b>
+    </div>
   </body>
 </html>
