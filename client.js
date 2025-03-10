@@ -1,4 +1,4 @@
-const apiUrl = "https://localhost:3000/";
+const apiUrl = "https://localhost:443/";
 let currentUser = null;
 
 const localStorageKeys = {
