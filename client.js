@@ -1,11 +1,14 @@
-const apiUrl = "http://localhost:3000/";
+const apiUrl = "https://localhost:3000/";
 let currentUser = null;
+
 const localStorageKeys = {
   user: "user",
+  token: "authToken",
 };
+
 const elements = {
   loginFormContainer: undefined,
-  welcomePageContainer: undefined,
+  registerformContainer: undefined,
   loadingPageContainer: undefined,
   loginButton: undefined,
   logoutButton: undefined,
@@ -13,6 +16,18 @@ const elements = {
   chatContainer: undefined,
   messagesContainer: undefined,
   textArea: undefined,
+  lackOfInfoRegistration: undefined,
+  registerButton: undefined,
+  chatDiv: undefined,
+  welcomeMessageLogin: undefined,
+  navbar: undefined,
+  allUsersBtn: undefined,
+  allUsersDiv: undefined,
+  navElement: undefined,
+  chatLink: undefined,
+  MyProfileButton: undefined,
+  MyProfileDiv: undefined,
+  userProfileForm: undefined,
 };
 
 function getCurrentTime() {
@@ -22,233 +37,568 @@ function getCurrentTime() {
 }
 
 async function readingMessagesFromServer() {
-  console.log(currentUser);
-  if (!currentUser || !currentUser.id) {
+  if (!currentUser || !currentUser._id) {
+    console.log("test2 messaeges 0.3");
+
     return;
   }
 
   console.log("Reading messages from server");
+  const token = localStorage
+    .getItem(localStorageKeys.token)
+    .trim()
+    .replace(/^"|"$/g, "");
 
   const response = await fetch(apiUrl + "messages", {
     method: "GET",
     headers: {
-      authorization: currentUser.id,
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
   });
+
   if (response.status !== 200) {
     return;
   }
 
   const messages = await response.json();
 
-  const existingMessagesElements = document.querySelectorAll(".groupMessages");
-
-  // const user = await response();
-
-  if (existingMessagesElements) {
-    for (let i = 0; i < existingMessagesElements.length; i++) {
-      console.log("remove", i, existingMessagesElements.length);
-      existingMessagesElements[i].remove();
-    }
-  }
-
-  for (let i = 0; i < messages.length; i++) {
+  const messagesContainer = document.getElementById("messagesContainer");
+  messagesContainer.innerHTML = "";
+  messages.forEach((message) => {
     const messageDiv = document.createElement("div");
-    messageDiv.classList.add("groupMessages");
-    messageDiv.innerHTML =
-      "at " +
-      messages[i].timestamp +
-      "  " +
-      messages[i].authorName +
-      " said : " +
-      messages[i].content;
-    elements.messagesContainer.append(messageDiv);
-  }
+    messageDiv.classList.add(
+      "groupMessages",
+      "border",
+      "p-2",
+      "mb-3",
+      "rounded"
+    );
+
+    //Preverjanje cigavo je sporocilo
+    if (message.authorId === currentUser._id) {
+      messageDiv.classList.add("sent-message");
+    } else {
+      messageDiv.classList.add("received-message");
+    }
+
+    messageDiv.innerHTML = `
+      <p><strong>${message.authorName}</strong> at ${message.timestamp} said:</p>
+      <p>${message.content}</p>
+    `;
+
+    messagesContainer.appendChild(messageDiv);
+  });
 }
-
-// function checkConiditons(firstSring, SecondString){
-
-// }
-
+function showAllUsers() {
+  console.log("ShowAllUsers called");
+  elements.chatDiv.classList.add("hidden");
+  elements.allUsersDiv.classList.remove("hidden");
+}
 function showWelcomePageContainer() {
   console.log("showWelcomePageContainer");
+  console.log("Chat container:", elements.chatContainer);
+  console.log("Messages container:", elements.messagesContainer);
+  elements.navbar.classList.remove("hidden");
   elements.loginFormContainer.classList.add("hidden");
-  elements.loadingPageContainer.classList.add("hidden");
-  elements.welcomePageContainer.classList.remove("hidden");
-
-  const greetingsDiv = document.getElementById("resultPragraph");
-  greetingsDiv.innerHTML =
-    currentUser.firstName +
-    " " +
-    currentUser.lastName +
-    " was signed in succesfully!";
-
+  elements.registerformContainer.classList.add("hidden");
   elements.chatContainer.classList.remove("hidden");
   elements.messagesContainer.classList.remove("hidden");
+  console.log(
+    "Classes on chatContainer after removal:",
+    elements.chatContainer.classList
+  );
+  if (currentUser.role == "admin") {
+    elements.allUsersBtn.classList.remove("hidden");
+  } else {
+    elements.allUsersBtn.classList.add("hidden");
+  }
   readingMessagesFromServer();
 }
 
 function showLoginFormContainer() {
   console.log("showLoginFormContainer");
-  // hidden welcomePageContainer and loadingPageContainer
-  elements.loadingPageContainer.classList.add("hidden");
-  elements.welcomePageContainer.classList.add("hidden");
   elements.loginFormContainer.classList.remove("hidden");
   elements.chatContainer.classList.add("hidden");
   elements.messagesContainer.classList.add("hidden");
+  elements.chatDiv.classList.add("hidden");
 }
 
 function showTheChat() {
   console.log("showTheChat");
-  elements.loadingPageContainer.classList.add("hidden");
+  // elementsnavElement.classList.remove("hidden");
   elements.loginFormContainer.classList.add("hidden");
   elements.messagesContainer.classList.remove("hidden");
 }
+
+//Ko se nalozijo elementi se pogleda ce je user ze prijavljen
 window.addEventListener("DOMContentLoaded", async () => {
   console.log("DOMContentLoaded");
+  elements.MyProfileButton = document.getElementById("myProfileButton");
+  elements.MyProfileDiv = document.getElementById("MyProfile");
+  elements.userInfo = document.getElementById("userList");
   elements.loginButton = document.getElementById("loginButton");
+  elements.navbar = document.getElementById("navbar");
+  elements.welcomeMessageLogin = document.getElementById("welcomeMessageLogIn");
   elements.logoutButton = document.getElementById("logoutButton");
   elements.sendMessageButton = document.getElementById("sendMessageButton");
+  elements.allUsersBtn = document.getElementById("viewUsersTab");
+  elements.allUsersDiv = document.getElementById("allUsers");
+  elements.navElement = document.getElementById("hiddenNav");
+  elements.userProfileForm = document.getElementById("userProfileForm");
+  elements.chatLink = document.getElementById("showChatLink");
+  //ustvarjanje sporocil
   elements.chatContainer = document.getElementById("chatContainer");
+  elements.registerButton = document.getElementById("registerButton");
   elements.loginFormContainer = document.getElementById("loginFormContainer");
-  elements.welcomePageContainer = document.getElementById(
-    "welcomePageContainer"
-  );
+  elements.lackOfInfoRegistration =
+    document.getElementById("lackOfInformationR");
+
   elements.loadingPageContainer = document.getElementById(
     "loadingPageContainer"
   );
+  // prikaz sporocil
   elements.messagesContainer = document.getElementById("messagesContainer");
   elements.textArea = document.getElementById("message");
+  elements.chatDiv = document.getElementById("chatContainer");
+  elements.registerformContainer = document.getElementById(
+    "registerFormContainer"
+  );
+
+  document
+    .getElementById("userProfileForm")
+    .addEventListener("submit", async function (event) {
+      event.preventDefault();
+      console.log("Form submitted without refresh!");
+
+      const userProfileData = {
+        firstName: document.getElementById("profileFname").value,
+        lastName: document.getElementById("profileLname").value,
+        email: document.getElementById("profileEmail").value,
+        password: document.getElementById("profilePassword").value,
+        phone: document.getElementById("profilePhone").value,
+        gender: document.getElementById("profileGender").value,
+      };
+      const userId = currentUser._id;
+      const token = localStorage
+        .getItem(localStorageKeys.token)
+        .trim()
+        .replace(/^"|"$/g, "");
+      try {
+        const response = await fetch(
+          `http://localhost:3000/userInfo/${userId}`,
+
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(userProfileData),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to update profile");
+        }
+
+        const result = await response.json();
+        console.log("Profile updated successfully:", result);
+
+        // Lahko dodaš obvestilo za uporabnika (npr. alert)
+        alert("Profile updated successfully!");
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        alert("Error updating profile. Please try again.");
+      }
+    });
 
   const storedUserString = localStorage.getItem(localStorageKeys.user);
-  if (storedUserString) {
+  const token = localStorage.getItem(localStorageKeys.token);
+  if (storedUserString && token) {
     const storedUser = JSON.parse(storedUserString);
-    if (storedUser && storedUser.id) {
-      const params = new URLSearchParams({
-        id: storedUser.id,
-      });
 
-      const response = await fetch(apiUrl + "user" + "?" + params);
-      if (response.status === 200) {
-        const user = await response.json();
-
-        if (user && user.id) {
-          currentUser = user;
-        }
-      }
+    const response = await fetch(apiUrl + "verifyToken", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (response.status === 200) {
+      console.log("Token je veljaven");
+      currentUser = storedUser;
+      showWelcomePageContainer();
+    } else {
+      console.log("Token ni veljaven");
+      currentUser = null;
+      window.localStorage.removeItem(localStorageKeys.user);
+      window.localStorage.removeItem(localStorageKeys.token);
+      showLoginFormContainer();
     }
-  }
-  if (currentUser && currentUser.id) {
-    // call API to get user information
-    showWelcomePageContainer();
   } else {
     currentUser = null;
     showLoginFormContainer();
   }
 
-  elements.loginButton.addEventListener("click", async () => {
-    console.log("loginButton clicked");
+  document
+    .getElementById("registerLink")
+    .addEventListener("click", function (event) {
+      event.preventDefault();
 
-    const first = document.getElementById("Fname");
-    const second = document.getElementById("Lname");
+      document.getElementById("loginFormContainer").classList.add("hidden");
 
-    const firstName = first.value;
-    const secondName = second.value;
+      document
+        .getElementById("registerFormContainer")
+        .classList.remove("hidden");
+    });
 
-    const data = {
-      firstName,
-      lastName: secondName,
-    };
-    // tu dobimo da se v en obkejt shrai kaj mi damo v First name in pa second name
-    function checkConiditons() {}
+  document
+    .getElementById("loginLink")
+    .addEventListener("click", function (event) {
+      event.preventDefault();
 
-    // function checkConiditons(first, secondName) {
-    if (!data.firstName || !data.lastName) {
-      const lackOfInfo = document.getElementById("lackOfInformation");
-      lackOfInfo.innerHTML = "Fill in both fields please!";
-      return;
-    }
-    // }
+      document.getElementById("loginFormContainer").classList.remove("hidden");
 
-    // nato pa postamo ta objekt na naš server
+      document.getElementById("registerFormContainer").classList.add("hidden");
+    });
 
-    const response = await fetch(apiUrl + "user", {
-      method: "POST",
+  //Preusmeritev na chat
+  elements.chatLink.addEventListener("click", async () => {
+    showWelcomePageContainer();
+    elements.allUsersDiv.classList.add("hidden");
+  });
+  //Pridobivanje vseh uporabnikov
+  elements.allUsersBtn.addEventListener("click", async () => {
+    const token = localStorage
+      .getItem(localStorageKeys.token)
+      .trim()
+      .replace(/^"|"$/g, "");
+    console.log("AllUsers was clicked, shranjeni token : " + token);
+    const usersList = await fetch(apiUrl + "allUsers", {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(data),
     });
-    const user = await response.json();
-    if (user && user.id) {
-      currentUser = user;
-      window.localStorage.setItem(
-        localStorageKeys.user,
-        JSON.stringify(currentUser)
-      );
-      showWelcomePageContainer();
-      const lackOfInfo = document.getElementById("lackOfInformation");
-      lackOfInfo.innerHTML = "";
+
+    const clonedResponse = await usersList.clone().json();
+    console.log("JSON Response:", clonedResponse);
+    if (clonedResponse.success === true) {
+      const users = clonedResponse.users;
+      const userListElement = document.getElementById("userList");
+      userListElement.innerHTML = "";
+
+      if (Array.isArray(users)) {
+        users.forEach((user) => {
+          const userItem = document.createElement("li");
+          userItem.classList.add("list-group-item");
+          userItem.textContent = `${user.firstName} ${user.lastName} (${user.email})`;
+
+          const deleteButton = document.createElement("button");
+          deleteButton.textContent = "Delete";
+          deleteButton.classList.add("delete-btn-user");
+          deleteButton.addEventListener("click", async function () {
+            const token = localStorage
+              .getItem(localStorageKeys.token)
+              .trim()
+              .replace(/^"|"$/g, "");
+            userItem.remove();
+
+            try {
+              const response = await fetch(
+                `${apiUrl}usersDelete/${user.uuid}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+
+              if (response.ok) {
+                console.log(`User with ID ${user.uuid} deleted successfully.`);
+                userItem.remove();
+              } else {
+                const errorData = await response.json();
+                console.error(
+                  "Napaka pri brisanju uporabnika:",
+                  errorData.message
+                );
+                alert("Brisanje ni uspelo: " + errorData.message);
+              }
+            } catch (error) {
+              console.error("Napaka pri povezavi z API-jem:", error);
+              alert("Napaka pri povezavi z API-jem.");
+            }
+          });
+
+          userListElement.appendChild(userItem);
+          userItem.appendChild(deleteButton);
+        });
+        document.getElementById("allUsers").classList.remove("hidden");
+        showAllUsers();
+      } else {
+        console.error("Users ni array:", users);
+      }
+    } else {
+      console.error("Napaka pri pridobivanju uporabnikov:", usersList.status);
     }
   });
 
-  elements.logoutButton.addEventListener("click", async () => {
-    console.log("logoutButton clicked");
-
-    const params = new URLSearchParams({
-      id: currentUser.id,
+  //My profile button
+  elements.MyProfileButton.addEventListener("click", async () => {
+    console.log("TRENUTNI UPORABNIK" + currentUser._id);
+    const token = localStorage
+      .getItem(localStorageKeys.token)
+      .trim()
+      .replace(/^"|"$/g, "");
+    const response = await fetch(apiUrl + "userInfo", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
+    const responseData = await response.json();
+    console.log(responseData.user);
+    if (responseData.success == true) {
+      console.log("Moj profil najden");
+      console.log(responseData.user);
 
-    await fetch(apiUrl + "user" + "?" + params, {
-      method: "DELETE",
-    })
-      .then((x) => x.text())
-      .then((response) => console.log(response));
-    currentUser = null;
-    window.localStorage.removeItem(localStorageKeys.user);
+      document.getElementById("MyProfile").classList.remove("hidden");
+      const fnameInput = document.getElementById("profileFname");
+      const lnameInput = document.getElementById("profileLname");
+      const emailInput = document.getElementById("profileEmail");
+      const phoneInput = document.getElementById("profilePhone");
+      const passwordInput = document.getElementById("profilePassword");
+      const genderInput = document.getElementById("profileGender");
 
-    // await fetch(apiUrl + "messages", {
-    //   method: "DELETE",
-    // });
-    // .then((x) => x.text())
-    // .then((response) => console.log(response));
+      fnameInput.value = responseData.user.firstName;
+      lnameInput.value = responseData.user.lastName;
+      emailInput.value = responseData.user.email;
+      phoneInput.value = responseData.user.phoneNumber;
 
-    showLoginFormContainer();
+      genderInput.value = responseData.user.gender;
+
+      elements.chatContainer.classList.add("hidden");
+      elements.chatContainer.classList.add("hidden");
+    } else if (responseData.status == 404) {
+      console.log("Napaka 404 pri iskanju profila");
+    } else {
+      console.log("unathorized?");
+    }
   });
 
+  //pošiljanje sporočil delujoče
+  //to je sedaj uredu
   elements.sendMessageButton.addEventListener("click", async () => {
     console.log("send message was clicked");
-    const authorId = currentUser.id;
+
+    const currentUserStrinigiy = JSON.stringify(currentUser);
+    console.log("send message was clicked user" + currentUserStrinigiy);
+    const authorId = currentUser._id;
+    const authorEmail = currentUser.email;
     const authorName = currentUser.firstName + " " + currentUser.lastName;
     const timestamp = getCurrentTime();
     const contentEl = document.getElementById("message");
     const content = contentEl.value;
-
     if (!content) {
-      return;
+      return; // If the content is empty, return and don't send
     }
-
     const messageToServer = {
       authorId,
+      authorEmail,
       authorName,
       timestamp,
       content,
     };
 
     console.log(messageToServer);
-    const messagePosted = await fetch(apiUrl + "messages", {
+    const token = localStorage
+      .getItem(localStorageKeys.token)
+      .trim()
+      .replace(/^"|"$/g, "");
+    console.log("TOKEN" + token);
+    console.log("TOKEN 2" + currentUser.token);
+
+    const messagePosted = await fetch(apiUrl + "postMessage", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: authorId,
-        // authorId,L?
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(messageToServer),
     });
+    if (messagePosted.ok) {
+      elements.textArea.value = "";
+      readingMessagesFromServer();
+      showTheChat();
+    } else {
+      console.error("Failed to post message.");
+    }
+  });
 
-    elements.textArea.value = "";
-    readingMessagesFromServer();
-    showTheChat();
+  //Log in delujoči
+  elements.loginButton.addEventListener("click", async () => {
+    console.log("loginButton clicked");
+    const email = document.getElementById("email");
+    const password = document.getElementById("passwordLogin");
+    const emailValue = email.value;
+    const psw = password.value;
+
+    const data = {
+      emailValue,
+      psw,
+    };
+
+    if (!data.emailValue || !data.psw) {
+      const lackOfInfo = document.getElementById("lackOfInformation");
+      lackOfInfo.innerHTML =
+        "Fill in all fields (first name, last name, email) please!";
+      return;
+    }
+
+    const response = await fetch(apiUrl + "userLogin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.status == 404) {
+      const errorData = await response.text();
+      console.error("User doesn't exist:", errorData);
+      const lackOfInfo = document.getElementById("lackOfInformation");
+      lackOfInfo.innerHTML = "User doesn't exist.";
+      return;
+    }
+    if (response.status == 401) {
+      const errorData = await response.text();
+      console.error("Incorrect password:", errorData);
+      const lackOfInfo = document.getElementById("lackOfInformation");
+      lackOfInfo.innerHTML = "Incorrect password.";
+      return;
+    }
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error("Error response from server:", errorData);
+      const lackOfInfo = document.getElementById("lackOfInformation");
+      lackOfInfo.innerHTML = "Something went wrong, please try again later!";
+      return;
+    }
+
+    const responseTwo = await response.json();
+    console.log("user" + responseTwo.user);
+    if (responseTwo.success == true) {
+      currentUser = responseTwo.user;
+      attributedToken = responseTwo.token;
+      window.localStorage.setItem(
+        localStorageKeys.user,
+        JSON.stringify(currentUser)
+      );
+      window.localStorage.setItem(
+        localStorageKeys.token,
+        JSON.stringify(attributedToken)
+      );
+
+      showWelcomePageContainer();
+      elements.welcomeMessageLogin.innerHTML = `Welcome back, ${currentUser.firstName} ${currentUser.lastName} !`;
+      const lackOfInfo = document.getElementById("lackOfInformation");
+      elements.loginFormContainer.classList.add("hidden");
+      lackOfInfo.innerHTML = "";
+    }
+  });
+
+  //registracija delujoča
+  elements.registerButton.addEventListener("click", async () => {
+    console.log("registerButton clicked");
+
+    const first = document.getElementById("FnameR");
+    const second = document.getElementById("LnameR");
+    const email = document.getElementById("emailR");
+    const password = document.getElementById("passwordReg");
+    const rojstniDatum = document.getElementById("dobR");
+    const gender = document.getElementById("genderR");
+
+    const firstName = first.value;
+    const secondName = second.value;
+    const emailValue = email.value;
+    const psw = password.value;
+    const rojstniDan = rojstniDatum.value;
+    const genderValue = gender.value;
+
+    const data = {
+      firstName,
+      lastName: secondName,
+      emailValue,
+      psw,
+      rojstniDan,
+      genderValue,
+    };
+
+    if (
+      !data.firstName ||
+      !data.lastName ||
+      !data.emailValue ||
+      !data.psw ||
+      !data.rojstniDan ||
+      !data.genderValue
+    ) {
+      const lackOfInfo = document.getElementById("lackOfInformationR");
+      lackOfInfo.innerHTML =
+        "Fill in all fields (first name, last name, email) please!";
+      return;
+    }
+
+    const response = await fetch(apiUrl + "userRegistracija", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.status == 409) {
+      const errorData = await response.text();
+      console.error("User already exists:", errorData);
+      const lackOfInfo = document.getElementById("lackOfInformationR");
+      lackOfInfo.innerHTML = "User with this email already exists.";
+      return;
+    }
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error("Error response from server:", errorData);
+      const lackOfInfo = document.getElementById("lackOfInformationR");
+      lackOfInfo.innerHTML = "Something went wrong, please try again later!";
+      return;
+    }
+
+    console.log("before register");
+    const responseSecond = await response.json();
+    if (responseSecond.success == true) {
+      const lackOfInfo = document.getElementById("lackOfInformation");
+      document.getElementById("registerFormContainer").classList.add("hidden");
+      lackOfInfo.innerHTML = "";
+      showLoginFormContainer();
+    }
+  });
+
+  //logout delujoči
+  elements.logoutButton.addEventListener("click", async () => {
+    elements.navbar.classList.add("hidden");
+    elements.allUsersDiv.classList.add("hidden");
+    console.log("logoutButton clicked");
+    const email = document.getElementById("email");
+    const password = document.getElementById("passwordLogin");
+    email.value = "";
+    password.value = "";
+    currentUser = null;
+    window.localStorage.removeItem(localStorageKeys.user);
+    window.localStorage.removeItem(localStorageKeys.token);
+    showLoginFormContainer();
   });
 
   console.log("beforeReadingMessages");

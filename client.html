@@ -1,50 +1,390 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <link rel="stylesheet" href="client.css" />
-    <script src="client.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chat App</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+    />
+    <script src="client.js" defer></script>
+    <style>
+      body {
+        font-family: "Montserrat", sans-serif;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+      .containers {
+        background-color: #f3edd6;
+        max-width: 400px;
+        margin: auto;
+        padding: 20px;
+        border-radius: 8px;
+      }
+      #loginFormContainer,
+      #registerFormContainer {
+        margin-top: 60px;
+        background-color: #b3d9ff;
+      }
+      .chat-container {
+        display: flex;
+        height: 100vh;
+      }
+      .input-container {
+        width: 40%;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        background-color: #f8f9fa;
+        position: relative;
+        height: 100%;
+      }
+      .messages-container {
+        background-color: #f5f5f5bd;
+        width: 60%;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        overflow-y: auto;
+      }
+      .messages-container-buttons {
+        display: flex; /* Postavi gumbe vodoravno */
+        gap: 10px; /* Določi prostor med gumbi */
+        margin-bottom: 20px; /* Lahko dodaš prostor spodaj, če želiš ločiti gumbe od drugih elementov */
+      }
+      .logout-button,
+      .delete-button {
+        padding: 10px; /* Oblikovanje gumbov */
+      }
+      .message-box {
+        border-bottom: 1px solid #ccc;
+        padding: 10px;
+      }
+
+      .logout-button {
+        position: absolute;
+        top: 0;
+        right: 10px;
+        margin-top: 10px;
+        background-color: #b3d9ff;
+      }
+      .delete-button {
+        position: absolute;
+        top: 0;
+        right: 10px;
+        margin-top: 10px;
+        background-color: #72b4f5;
+      }
+      .received-message {
+        background-color: #b3d9ff;
+        align-self: flex-start;
+        text-align: left;
+        color: #003366;
+        border-radius: 10px;
+        padding: 10px;
+        max-width: 70%;
+      }
+
+      .sent-message {
+        background-color: #eeefff;
+        align-self: flex-end;
+        text-align: right;
+        color: #ac8ced;
+        border-radius: 10px;
+        padding: 10px;
+        max-width: 70%;
+        word-wrap: break-word;
+        margin-bottom: 10px;
+      }
+      .message-container {
+        display: flex;
+        flex-direction: column;
+      }
+      button {
+        border: none;
+        border-radius: 8px;
+        padding: 10px 15px;
+        transition: 0.3s;
+        background-color: #89c2d9;
+      }
+
+      #message {
+        height: 200px;
+        border-radius: 8px;
+        margin-top: auto;
+      }
+      .logo-style {
+        display: block;
+        margin: 20px auto;
+        max-width: 150px;
+        margin-top: 20%;
+        height: auto;
+      }
+      .navbar {
+        margin-bottom: 10px;
+        background-color: #f4edf8;
+      }
+      #allUsers {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 600px; /* Nastavite širino div-a */
+        margin: 50px auto; /* S tem se div postavi na sredino horizontalno in doda nekaj prostora na vrhu */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      #userList {
+        list-style-type: none;
+        padding-left: 0;
+      }
+      #userList li {
+        padding: 10px;
+        margin: 5px 0;
+        background-color: #f8f8f8;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease;
+        height: 50px;
+        overflow: hidden;
+      }
+      .delete-btn-user {
+        padding: 5px 10px;
+        background-color: #f4edf8; /* Rdeča barva za opozorilo */
+        color: black;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9em;
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+      }
+
+      @media (max-width: 768px) {
+        .MyProfileForm {
+          width: 60%; /* Namesto fiksne širine */
+          padding: 15px; /* Manjši padding za manjše zaslone */
+        }
+      }
+
+      @media (max-width: 480px) {
+        .MyProfileForm {
+          width: 60%; /* Skoraj čez cel zaslon na zelo majhnih napravah */
+          padding: 10px;
+        }
+      }
+    </style>
   </head>
+  <body class="bg-light">
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-light hidden">
+      <div class="container-fluid">
+        <a class="navbar-brand" id="showChatLink" href="#">MyChat</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <button
+                id="logoutButton"
+                class="nav-link btn btn-outline-primary"
+              >
+                Logout
+              </button>
+            </li>
 
-  <body>
-    <div id="loginFormContainer" class="containers hidden">
-      <label for="Fname"> First name:</label>
-      <input class="inputs" type="text" id="Fname" />
-      <br /><br />
-
-      <label for="Lname">Last name:</label>
-      <input class="inputs" type="text" id="Lname" />
-
-      <div id="lackOfInformation"></div>
-
-      <br /><br />
-
-      <button type="submit" id="loginButton">Sign up</button>
-    </div>
-
-    <div id="welcomePageContainer" class="hidden containers">
-      <div id="resultPragraph"></div>
-      <button type="submit" id="logoutButton" style="margin-top: 10px">
-        sign out
+            <li class="nav-item">
+              <button id="viewUsersTab" class="nav-link btn btn-outline-info">
+                All Users
+              </button>
+            </li>
+            <li class="nav-item">
+              <button
+                id="myProfileButton"
+                class="nav-link btn btn-outline-primary"
+              >
+                My profile
+              </button>
+            </li>
+            <li id="hiddenNav" class="nav-item hidden">
+              <button id="backToChat" class="nav-link btn btn-outline-primary">
+                Chat
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div id="loginFormContainer" class="containers bg-white p-4 shadow">
+      <h3 class="text-center">Sign Up</h3>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email:</label>
+        <input class="form-control" type="text" id="email" />
+      </div>
+      <div class="mb-3">
+        <label for="passwordLogin" class="form-label">Password:</label>
+        <input class="form-control" type="password" id="passwordLogin" />
+      </div>
+      <div id="lackOfInformation" class="text-danger"></div>
+      <button type="submit" id="loginButton" class="btn btn-primary w-100">
+        Sign up
       </button>
+      <p class="text-center mt-3">
+        Don't have an account yet? <a href="#" id="registerLink">Register</a>
+      </p>
     </div>
 
-    <div id="loadingPageContainer" class="containers">Please wait...</div>
-
-    <div id="chatContainer" class="chatContainer hidden">
-      <b style="text-decoration: underline">COMPOSE YOUR MESSAGE:</b>
-      <br /><br />
-      <textarea id="message"></textarea>
-
-      <button
-        type="submit"
-        id="sendMessageButton"
-        style="margin-left: 18px; margin-bottom: 10px"
-      >
-        send message
+    <div
+      id="registerFormContainer"
+      class="containers bg-white p-4 shadow hidden"
+    >
+      <h3 class="text-center">Register</h3>
+      <div class="mb-3">
+        <label for="FnameR" class="form-label">First name:</label>
+        <input class="form-control" type="text" id="FnameR" />
+      </div>
+      <div class="mb-3">
+        <label for="LnameR" class="form-label">Last name:</label>
+        <input class="form-control" type="text" id="LnameR" />
+      </div>
+      <div class="mb-3">
+        <label for="emailR" class="form-label">Email:</label>
+        <input class="form-control" type="text" id="emailR" />
+      </div>
+      <div class="mb-3">
+        <label for="passwordReg" class="form-label">password:</label>
+        <input class="form-control" type="password" id="passwordReg" />
+      </div>
+      <div class="mb-3">
+        <label for="dobR" class="form-label">Phone number:</label>
+        <input class="form-control" type="text" id="dobR" required />
+      </div>
+      <div class="mb-3">
+        <label for="genderR" class="form-label">Gender:</label>
+        <select class="form-select" id="genderR">
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div id="lackOfInformationR" class="text-danger"></div>
+      <button type="submit" id="registerButton" class="btn btn-primary w-100">
+        Register
       </button>
+      <p class="text-center mt-3">
+        Already have an account? <a href="#" id="loginLink">Login</a>
+      </p>
     </div>
-    <div id="messagesContainer" class="messagesContainer hidden">
-      <b style="text-decoration: underline">MESSAGES:</b>
+    <div id="chatContainer" class="chat-container hidden">
+      <div id="messagesContainer" class="messages-container">
+        <h5 class="text-decoration-underline">MESSAGES:</h5>
+      </div>
+
+      <div id="inputContainerMessage" class="input-container">
+        <h5 id="welcomeMessageLogIn"></h5>
+
+        <img
+          id="logo"
+          src="C:\Users\991460\Desktop\Diplomska\logoDiplomska.png"
+          alt="Logo"
+          class="logo-style"
+        />
+
+        <textarea id="message" class="form-control mb-2" rows="2"></textarea>
+        <button type="submit" id="sendMessageButton">Send message</button>
+      </div>
     </div>
+
+    <div id="allUsers" class="hidden">
+      <h3>All Users</h3>
+      <ul id="userList" class="list-group"></ul>
+    </div>
+
+    <div id="MyProfile" class="hidden MyProfileForm">
+      <form id="userProfileForm">
+        <div class="mb-3">
+          <label for="profileFname" class="form-label">First Name:</label>
+          <input
+            type="text"
+            class="form-control"
+            id="profileFname"
+            value="John"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="profileLname" class="form-label">Last Name:</label>
+          <input
+            type="text"
+            class="form-control"
+            id="profileLname"
+            value="Doe"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="profileEmail" class="form-label">Email:</label>
+          <input
+            type="email"
+            class="form-control"
+            id="profileEmail"
+            value="john.doe@example.com"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="profilePassword" class="form-label"
+            >Enter new passsword (optional):</label
+          >
+          <input
+            type="password"
+            class="form-control"
+            id="profilePassword"
+            placeholder="Leave empty to keep the same password"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="profilePhone" class="form-label">Phone Number:</label>
+          <input
+            type="text"
+            class="form-control"
+            id="profilePhone"
+            value="123-456-789"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="profileGender" class="form-label">Gender:</label>
+          <select class="form-select" id="profileGender" required>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+      </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
