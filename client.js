@@ -186,7 +186,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         .replace(/^"|"$/g, "");
       try {
         const response = await fetch(
-          `http://localhost:3000/userInfo/${userId}`,
+          ` https://localhost:443/userInfo/${userId}`,
 
           {
             method: "PUT",
