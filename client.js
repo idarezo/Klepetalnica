@@ -1,4 +1,4 @@
-const apiUrl = "https://localhost:443/";
+const apiUrl = "https://3330-86-58-12-206.ngrok-free.app/";
 let currentUser = null;
 
 const localStorageKeys = {
@@ -54,6 +54,7 @@ async function readingMessagesFromServer() {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
+      "ngrok-skip-browser-warning": "skip-browser-warning",
     },
   });
 
@@ -186,7 +187,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         .replace(/^"|"$/g, "");
       try {
         const response = await fetch(
-          ` https://localhost:443/userInfo/${userId}`,
+          ` https://192.168.1.10:443/userInfo/${userId}`,
 
           {
             method: "PUT",
@@ -359,6 +360,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "skip-browser-warning",
       },
     });
     const responseData = await response.json();
@@ -464,6 +466,8 @@ window.addEventListener("DOMContentLoaded", async () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Accept: "application/json",
+        // "ngrok-skip-browser-warning": "skip-browser-warning",
       },
       body: JSON.stringify(data),
     });
@@ -491,7 +495,9 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
 
     const responseTwo = await response.json();
-    console.log("user" + responseTwo.user);
+    console.log("user" + responseTwo.user.body);
+    console.log("Token" + responseTwo.token);
+
     if (responseTwo.success == true) {
       currentUser = responseTwo.user;
       attributedToken = responseTwo.token;
