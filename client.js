@@ -1,4 +1,4 @@
-const apiUrl ="https://192.168.0.14:443/";
+const apiUrl ="https://172.20.10.2:443/";
 let currentUser = null;
 
 const localStorageKeys = {
