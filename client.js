@@ -1,4 +1,4 @@
-const apiUrl ="https://172.20.10.2:443/";
+const apiUrl ="https://6e1e-86-58-12-206.ngrok-free.app/";
 let currentUser = null;
 
 const localStorageKeys = {
@@ -54,6 +54,7 @@ async function readingMessagesFromServer() {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
+      "ngrok-skip-browser-warning": "skip-browser-warning",
     },
   });
 
@@ -359,6 +360,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "skip-browser-warning",
       },
     });
     const responseData = await response.json();
