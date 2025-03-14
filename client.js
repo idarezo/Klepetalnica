@@ -363,7 +363,6 @@ window.addEventListener("DOMContentLoaded", async () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
         "ngrok-skip-browser-warning": "skip-browser-warning",
-        "ngrok-skip-browser-warning": "skip-browser-warning",
       },
     });
     const responseData = await response.json();
