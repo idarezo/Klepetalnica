@@ -56,6 +56,7 @@ async function readingMessagesFromServer() {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
       "ngrok-skip-browser-warning": "skip-browser-warning",
+      "ngrok-skip-browser-warning": "skip-browser-warning",
     },
   });
 
@@ -361,6 +362,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "skip-browser-warning",
         "ngrok-skip-browser-warning": "skip-browser-warning",
       },
     });
