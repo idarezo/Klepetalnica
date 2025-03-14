@@ -56,7 +56,6 @@ async function readingMessagesFromServer() {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
       "ngrok-skip-browser-warning": "skip-browser-warning",
-      "ngrok-skip-browser-warning": "skip-browser-warning",
     },
   });
 
@@ -225,6 +224,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "skip-browser-warning",
       },
     });
     if (response.status === 200) {
@@ -282,6 +282,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "skip-browser-warning",
       },
     });
 
@@ -432,6 +433,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "skip-browser-warning",
       },
       body: JSON.stringify(messageToServer),
     });
