@@ -1,4 +1,4 @@
-const apiUrl = "https://62ae-46-122-64-137.ngrok-free.app/";
+const apiUrl = "https://c193-46-122-64-137.ngrok-free.app/";
 
 let currentUser = null;
 
