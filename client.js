@@ -1,4 +1,4 @@
-const apiUrl = "https://klepetalnicadip.xyz/";
+const apiUrl = "https://klepetalnicadip.xyz/API";
 
 let currentUser = null;
 
